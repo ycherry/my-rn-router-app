@@ -1,0 +1,9 @@
+执行knip指令
+
+修复所有knip查出来的问题，对于所有package.json里面的依赖，要确保依赖是真的没有被使用才能删除
+
+执行eslint指令
+
+修复所有eslint问题
+
+直到所有的knip问题和eslint问题都已完成才算修复完毕

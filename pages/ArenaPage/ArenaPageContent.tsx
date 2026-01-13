@@ -29,7 +29,7 @@ export const ArenaPageContent = () => {
     { id: "go", label: t("arenaPage.go"), icon: "🔵" },
   ];
 
-  const { query } = useList({
+  const { query } = useList<ArenaBattle>({
     resource: "battles",
   });
 
@@ -46,15 +46,16 @@ export const ArenaPageContent = () => {
       console.log('Arena Page - No data, returning empty array');
       return [];
     }
-    console.log('Arena Page - data.data type:', typeof data.data);
-    console.log('Arena Page - data.data is array:', Array.isArray(data.data));
-    if (Array.isArray(data.data)) {
-      return data.data as ArenaBattle[];
-    } else if (data.data && typeof data.data === 'object' && Array.isArray(data.data.data)) {
+    const rawData = data.data;
+    console.log('Arena Page - rawData type:', typeof rawData);
+    console.log('Arena Page - rawData is array:', Array.isArray(rawData));
+    if (Array.isArray(rawData)) {
+      return rawData as ArenaBattle[];
+    } else if (rawData && typeof rawData === 'object' && 'data' in rawData && Array.isArray(rawData.data)) {
       // Handle nested data structure like { data: { data: [...] } }
-      return data.data.data as ArenaBattle[];
+      return rawData.data as unknown as ArenaBattle[];
     } else {
-      console.log('Unexpected data structure for data.data:', data.data);
+      console.log('Unexpected data structure for rawData:', rawData);
       return [];
     }
   }, [data?.data]);
@@ -81,7 +82,8 @@ export const ArenaPageContent = () => {
   }, [battles, searchQuery, selectedCategory]);
 
   const handleBattleClick = (battleId: number) => {
-    router.push(`/battle/${battleId}`);
+    // TODO: Implement navigation to battle detail page
+    console.log('Battle clicked:', battleId);
   };
 
   const backgroundColor = useThemeColor({}, 'background');
