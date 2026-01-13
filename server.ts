@@ -3,13 +3,19 @@
  * This server runs independently to handle authentication for the React Native app
  * API routes are organized in the app/api directory for better structure
  */
+import { config } from 'dotenv';
+import { resolve } from 'node:path';
+
+// Load environment variables from .env file
+config({ path: resolve(process.cwd(), '.env') });
+
 import cors from 'cors';
 import express from 'express';
 import { auth } from './lib/auth';
 import { BattleService } from './services/battleService';
 
 const app = express();
-const PORT = process.env.PORT || 8000;
+const PORT = Number(process.env.PORT) || 8000;
 
 // Enable CORS for React Native app
 app.use(cors({

@@ -1,10 +1,9 @@
 /**
  * Health check endpoint
  */
-import { json } from '@tanstack/start';
 
 export async function GET() {
-  return json({ 
+  return Response.json({ 
     status: 'ok', 
     timestamp: new Date().toISOString() 
   });

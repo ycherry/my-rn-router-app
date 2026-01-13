@@ -1,10 +1,10 @@
+import { getGithubEnv } from '@/lib/github-env'
 import { config } from 'dotenv'
-import { resolve } from 'node:path'
 import { drizzle } from 'drizzle-orm/node-postgres'
+import { resolve } from 'node:path'
 import { Pool } from 'pg'
-import { getGithubEnv } from '@/lib/github-env.ts'
 
-import * as schema from './schema.ts'
+import * as schema from './schema'
 
 // Load environment variables from the correct .env file
 config({ path: resolve(process.cwd(), '.env') })
@@ -23,8 +23,9 @@ const pool = new Pool({
 export const db = drizzle(pool, { schema })
 
 // Export DAOs
-export { usersDao } from './models/daos/users'
-export { userTokensDao } from './models/daos/userTokens'
-export { userSessionsDao } from './models/daos/userSessions'
 export { battlesDao } from './models/daos/battles'
 export { implementationsDao } from './models/daos/implementations'
+export { usersDao } from './models/daos/users'
+export { userSessionsDao } from './models/daos/userSessions'
+export { userTokensDao } from './models/daos/userTokens'
+

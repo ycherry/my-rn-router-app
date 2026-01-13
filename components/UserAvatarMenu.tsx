@@ -1,23 +1,21 @@
 import { useAuth } from "@/hooks/useAuth";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Alert,
-  Image,
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    Image,
+    Modal,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 export const UserAvatarMenu = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
   const { t } = useTranslation();
-  const router = useRouter();
 
   const handleLogout = () => {
     Alert.alert(

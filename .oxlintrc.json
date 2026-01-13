@@ -1,0 +1,20 @@
+{
+  "rules": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "pedantic": "warn",
+    "style": "warn",
+    "typescript": "error",
+    "react": "error",
+    "import": "error"
+  },
+  "ignorePatterns": ["node_modules/**", ".expo/**"],
+  "overrides": [
+    {
+      "files": ["**/*.test.tsx", "**/*.test.ts", "**/*.spec.tsx", "**/*.spec.ts"],
+      "rules": {
+        "react/jsx-handler-names": "off"
+      }
+    }
+  ]
+}
