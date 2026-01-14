@@ -3,7 +3,6 @@ import { Link, Redirect, Tabs } from 'expo-router';
 import React from 'react';
 import { Pressable } from 'react-native';
 
-import { CommonHeader } from '@/components/CommonHeader';
 import { useColorScheme } from '@/components/useColorScheme';
 import Colors from '@/constants/Colors';
 import { useAuth } from '@/hooks/useAuth';
@@ -30,18 +29,18 @@ export default function TabLayout() {
 
   return (
     <>
-      <CommonHeader />
+      {/* <CommonHeader /> */}
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
           // Disable the static render of the header on web
           // to prevent a hydration error in React Navigation v6.
-          headerShown: false,
+          // headerShown: false,
         }}>
         <Tabs.Screen
-          name="index"
+          name="arena"
           options={{
-            title: 'Tab One',
+            title: 'Arena',
             tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
             headerRight: () => (
               <Link href="/modal" asChild>
@@ -60,9 +59,9 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="two"
+          name="me"
           options={{
-            title: 'Tab Two',
+            title: '我',
             tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
           }}
         />

@@ -1,7 +1,6 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Refine } from '@refinedev/core';
-import simpleRestProvider from '@refinedev/simple-rest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { Stack, router } from 'expo-router';
@@ -12,6 +11,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { useAuth } from '@/hooks/useAuth';
+import { authClient } from '@/lib/auth-client';
 import '@/lib/i18n'; // 初始化 i18n
 import '../global.css'; // 导入全局样式
 
@@ -70,11 +70,139 @@ function RootLayoutNav() {
   }, [isAuthenticated, loading]);
 
   const queryClient = new QueryClient();
-  const dataProvider = simpleRestProvider('http://localhost:8000/api');
+  
+  // 获取认证 headers 和 cookies
+  const getAuthConfig = async () => {
+    try {
+      const session = await authClient.getSession();
+      console.log('[DataProvider] Session token:', session?.data?.session?.token);
+      
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      
+      // 使用 session 中的 token 构建 Cookie header
+      if (session?.data?.session?.token) {
+        // Better Auth 使用 session token 作为 cookie
+        headers['Cookie'] = `better-auth.session_token=${session.data.session.token}`;
+        console.log('[DataProvider] Added Cookie header with token');
+      } else {
+        console.log('[DataProvider] No session token found');
+      }
+      
+      console.log('[DataProvider] Final headers:', headers);
+      return headers;
+    } catch (error) {
+      console.error('[DataProvider] Error getting auth config:', error);
+      return {
+        'Content-Type': 'application/json',
+      };
+    }
+  };
+
+  // 重写 dataProvider 的方法以包含认证信息
+  const authenticatedDataProvider = {
+    getList: async (params: any) => {
+      const headers = await getAuthConfig();
+      const response = await fetch(
+        `http://localhost:8000/api/${params.resource}`,
+        {
+          credentials: 'include',
+          headers,
+        }
+      );
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Request failed');
+      }
+      
+      const data = await response.json();
+      return data;
+    },
+    getOne: async (params: any) => {
+      const headers = await getAuthConfig();
+      const response = await fetch(
+        `http://localhost:8000/api/${params.resource}/${params.id}`,
+        {
+          credentials: 'include',
+          headers,
+        }
+      );
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Request failed');
+      }
+      
+      const data = await response.json();
+      return data;
+    },
+    create: async (params: any) => {
+      const headers = await getAuthConfig();
+      const response = await fetch(
+        `http://localhost:8000/api/${params.resource}`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers,
+          body: JSON.stringify(params.variables),
+        }
+      );
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Request failed');
+      }
+      
+      const data = await response.json();
+      return data;
+    },
+    update: async (params: any) => {
+      const headers = await getAuthConfig();
+      const response = await fetch(
+        `http://localhost:8000/api/${params.resource}/${params.id}`,
+        {
+          method: 'PATCH',
+          credentials: 'include',
+          headers,
+          body: JSON.stringify(params.variables),
+        }
+      );
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Request failed');
+      }
+      
+      const data = await response.json();
+      return data;
+    },
+    deleteOne: async (params: any) => {
+      const headers = await getAuthConfig();
+      const response = await fetch(
+        `http://localhost:8000/api/${params.resource}/${params.id}`,
+        {
+          method: 'DELETE',
+          credentials: 'include',
+          headers,
+        }
+      );
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Request failed');
+      }
+      
+      const data = await response.json();
+      return data;
+    },
+    getApiUrl: () => 'http://localhost:8000/api',
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Refine dataProvider={dataProvider}>
+      <Refine dataProvider={authenticatedDataProvider}>
         <SafeAreaProvider>
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
             <Stack>

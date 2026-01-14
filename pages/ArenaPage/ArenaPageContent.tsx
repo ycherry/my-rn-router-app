@@ -35,20 +35,12 @@ export const ArenaPageContent = () => {
 
   const { data, isLoading, isError } = query;
 
-  // Debug logging
-  console.log('Arena Page - useList full data:', JSON.stringify(data, null, 2));
-  console.log('Arena Page - data?.data:', data?.data);
-  console.log('Arena Page - isLoading:', isLoading);
-  console.log('Arena Page - isError:', isError);
-
   const battles = useMemo(() => {
     if (!data?.data) {
       console.log('Arena Page - No data, returning empty array');
       return [];
     }
     const rawData = data.data;
-    console.log('Arena Page - rawData type:', typeof rawData);
-    console.log('Arena Page - rawData is array:', Array.isArray(rawData));
     if (Array.isArray(rawData)) {
       return rawData as ArenaBattle[];
     } else if (rawData && typeof rawData === 'object' && 'data' in rawData && Array.isArray(rawData.data)) {
@@ -61,11 +53,9 @@ export const ArenaPageContent = () => {
   }, [data?.data]);
 
   console.log('Arena Page - battles:', battles);
-  console.log('Arena Page - battles is array:', Array.isArray(battles));
 
   const filteredBattles = useMemo(() => {
     if (!Array.isArray(battles)) {
-      console.error('Arena Page - battles is not an array!', battles);
       return [];
     }
     return battles.filter((battle) => {
@@ -82,8 +72,7 @@ export const ArenaPageContent = () => {
   }, [battles, searchQuery, selectedCategory]);
 
   const handleBattleClick = (battleId: number) => {
-    // TODO: Implement navigation to battle detail page
-    console.log('Battle clicked:', battleId);
+    router.push(`/battle/${battleId}`);
   };
 
   const backgroundColor = useThemeColor({}, 'background');

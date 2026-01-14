@@ -1,0 +1,1 @@
+export { VotingHistoryPage } from "./VotingHistoryPage";

@@ -23,7 +23,7 @@ export const CommonHeader = () => {
       {isAuthenticated ? (
         <BrandDropdownMenu />
       ) : (
-        <Link href="/" style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Link href="/arena" style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'black' }}>
             {t("navigation.brand")}
           </Text>

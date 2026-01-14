@@ -1,0 +1,106 @@
+import { Text } from '@/components/Themed';
+import { useAuth } from '@/hooks/useAuth';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React, { useEffect } from 'react';
+import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { useStore } from 'zustand';
+import { useUserStore } from './_store';
+
+interface MenuItemProps {
+  icon: keyof typeof Ionicons.glyphMap;
+  title: string;
+  onPress: () => void;
+  showArrow?: boolean;
+}
+
+const MenuItem: React.FC<MenuItemProps> = ({ icon, title, onPress, showArrow = true }) => (
+  <TouchableOpacity
+    className="flex-row items-center justify-between bg-white px-5 py-4 border-b border-gray-100"
+    onPress={onPress}
+    activeOpacity={0.7}
+  >
+    <View className="flex-row items-center">
+      <Ionicons name={icon} size={24} color="#3b82f6" />
+      <Text className="ml-4 text-base">{title}</Text>
+    </View>
+    {showArrow && <Ionicons name="chevron-forward" size={20} color="#9ca3af" />}
+  </TouchableOpacity>
+);
+
+export const UserContent = () => {
+  const router = useRouter();
+  const store = useUserStore();
+  const { userName, userEmail, loading } = useStore(store);
+  const { logout, user, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      store.getState().setUserName(user.name || '');
+      store.getState().setUserEmail(user.email || '');
+    }
+    store.getState().setLoading(authLoading);
+  }, [user, authLoading, store]);
+
+  if (authLoading) {
+    return (
+      <View className="flex-1 items-center justify-center bg-gray-50">
+        <Text>加载中...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView className="flex-1 bg-gray-50">
+      {/* 用户信息头部 */}
+      <View className="bg-white pt-16 pb-8 px-5 mb-3">
+        <View className="flex-row items-center">
+          <View className="w-16 h-16 rounded-full bg-blue-500 items-center justify-center">
+            <Text className="text-white text-2xl font-bold">
+              {userName ? userName[0].toUpperCase() : 'U'}
+            </Text>
+          </View>
+          <View className="ml-4 flex-1">
+            <Text className="text-xl font-bold mb-1">{userName || '未设置'}</Text>
+            <Text className="text-gray-500 text-sm">{userEmail || '未设置'}</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* 功能菜单 */}
+      <View className="bg-white mb-3">
+        <MenuItem
+          icon="add-circle-outline"
+          title="Create Battle"
+          onPress={() => router.push('/create-battle')}
+        />
+        <MenuItem
+          icon="settings-outline"
+          title="Preferences"
+          onPress={() => router.push('/preferences')}
+        />
+        <MenuItem
+          icon="time-outline"
+          title="Voting History"
+          onPress={() => router.push('/voting-history')}
+        />
+        <MenuItem
+          icon="folder-outline"
+          title="My Projects"
+          onPress={() => router.push('/my-projects')}
+        />
+      </View>
+
+      {/* 退出登录按钮 */}
+      <View className="px-5 mt-5">
+        <TouchableOpacity
+          className="py-4 px-5 bg-white rounded-lg border border-gray-200"
+          onPress={logout}
+          activeOpacity={0.7}
+        >
+          <Text className="text-red-500 text-center text-base font-semibold">退出登录</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+};

@@ -1,24 +1,24 @@
 import {
-  authClient,
-  signInWithGitHub,
-  signInWithGoogle,
+    authClient,
+    signInWithGitHub,
+    signInWithGoogle,
 } from "@/lib/auth-client";
 import {
-  clearRememberedCredentials,
-  getRememberedCredentials,
-  saveRememberedCredentials,
+    clearRememberedCredentials,
+    getRememberedCredentials,
+    saveRememberedCredentials,
 } from "@/utils/rememberPassword";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Alert,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { useStore } from "zustand";
 import { useLoginPageStore } from "./_store";
@@ -97,7 +97,7 @@ export const LoginPageContent = () => {
           clearRememberedCredentials();
         }
         // 跳转到重定向页面或arena页面
-        router.push({ pathname: "/(tabs)" });
+        router.push({ pathname: "/arena" });
       } else {
         // 处理登录失败
         setLoginError(t("login.loginFailed"));

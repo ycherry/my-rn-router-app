@@ -33,7 +33,7 @@ export const auth = betterAuth({
       verification: authSchema.verification,
     },
   }),
-  baseURL: env.VITE_APP_URL || "http://localhost:3000",
+  baseURL: env.VITE_APP_URL || "http://localhost:8000",
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false, // We handle verification in registration
@@ -52,15 +52,19 @@ export const auth = betterAuth({
     github: {
       clientId: env.GITHUB_CLIENT_ID,
       clientSecret: env.GITHUB_CLIENT_SECRET,
-      redirectURI: `${env.VITE_APP_URL || "http://localhost:3000"}/api/auth/callback/github`,
+      redirectURI: `${env.VITE_APP_URL || "http://localhost:8000"}/api/auth/callback/github`,
     },
     google: {
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
-      redirectURI: `${env.VITE_APP_URL || "http://localhost:3000"}/api/auth/callback/google`,
+      redirectURI: `${env.VITE_APP_URL || "http://localhost:8000"}/api/auth/callback/google`,
     },
   },
-  trustedOrigins: [env.VITE_APP_URL || "http://localhost:3000"],
+  trustedOrigins: [
+    env.VITE_APP_URL || "http://localhost:8000",
+    "http://localhost:8000",
+    "http://localhost:3000",
+  ],
   session: {
     // Session 过期时间：7天 - session 的总有效期
     expiresIn: 60 * 60 * 24 * 7, // 7 days in seconds
