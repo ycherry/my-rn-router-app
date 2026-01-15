@@ -1,7 +1,9 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Text, View } from "react-native";
 
 export const BattleLoading = () => {
+  const { t } = useTranslation();
   return (
     <View className="min-h-screen bg-background container mx-auto px-6 py-8 space-y-8">
       <View className="flex flex-col space-y-4">
@@ -21,7 +23,7 @@ export const BattleLoading = () => {
         <View className="h-96 flex-1 bg-gray-300 rounded" />
       </View>
       <ActivityIndicator size="large" />
-      <Text>加载中...</Text>
+      <Text>{t('battlePage.loading')}</Text>
     </View>
   );
 };

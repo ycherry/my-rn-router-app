@@ -16,8 +16,6 @@ export const VotingHistoryPageContent = () => {
 
   const { data, isLoading, isError, error, refetch } = query;
 
-  console.log('Voting History Page - useList full data:', JSON.stringify(data, null, 2));
-  console.log('Voting History Page - error:', error);
 
   const votes = data?.data || [];
 

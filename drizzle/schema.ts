@@ -1,4 +1,4 @@
-import { pgTable, uniqueIndex, text, boolean, timestamp, index, foreignKey, serial, integer, jsonb, unique } from "drizzle-orm/pg-core"
+import { boolean, foreignKey, index, integer, jsonb, pgTable, serial, text, timestamp, unique, uniqueIndex } from "drizzle-orm/pg-core";
 
 
 
@@ -131,4 +131,23 @@ export const userPaymentMethods = pgTable("user_payment_methods", {
 			foreignColumns: [users.id],
 			name: "user_payment_methods_user_id_users_id_fk"
 		}).onDelete("cascade"),
+]);
+
+export const votes = pgTable("votes", {
+	id: serial().primaryKey().notNull(),
+	userId: text("user_id").notNull(),
+	implementationId: integer("implementation_id").notNull(),
+	createdAt: timestamp("created_at", { mode: 'date' }).defaultNow().notNull(),
+}, (table) => [
+	foreignKey({
+			columns: [table.userId],
+			foreignColumns: [users.id],
+			name: "votes_user_id_users_id_fk"
+		}),
+	foreignKey({
+			columns: [table.implementationId],
+			foreignColumns: [implementations.id],
+			name: "votes_implementation_id_implementations_id_fk"
+		}),
+	unique("votes_user_implementation_unique").on(table.userId, table.implementationId),
 ]);

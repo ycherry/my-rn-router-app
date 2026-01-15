@@ -140,23 +140,34 @@ function RootLayoutNav() {
     },
     create: async (params: any) => {
       const headers = await getAuthConfig();
+      // 特殊处理 votes 资源，只发送 implementationId
+      const body = params.resource === 'votes' 
+        ? JSON.stringify({ implementationId: params.variables.implementationId })
+        : JSON.stringify(params.values);
+
+      console.log('[DataProvider] Creating resource:', params.resource);
+      console.log('[DataProvider] Raw params.values:', params.values);
+      console.log('[DataProvider] Stringified body:', body);
+      
       const response = await fetch(
         `http://localhost:8000/api/${params.resource}`,
         {
           method: 'POST',
           credentials: 'include',
           headers,
-          body: JSON.stringify(params.variables),
+          body,
         }
       );
       
       if (!response.ok) {
         const error = await response.json();
+        console.error('[DataProvider] Create failed:', error);
         throw new Error(error.error || 'Request failed');
       }
       
       const data = await response.json();
-      return data;
+      console.log('[DataProvider] Create success:', data);
+      return { data };
     },
     update: async (params: any) => {
       const headers = await getAuthConfig();
@@ -166,7 +177,7 @@ function RootLayoutNav() {
           method: 'PATCH',
           credentials: 'include',
           headers,
-          body: JSON.stringify(params.variables),
+          body: JSON.stringify(params.values),
         }
       );
       

@@ -1,4 +1,24 @@
 {
+  "common": {
+    "error": "错误",
+    "success": "成功",
+    "ok": "确定",
+    "cancel": "取消"
+  },
+  "createBattle": {
+    "title": "创建战斗",
+    "subtitle": "创建一个新的代码对决并与社区分享",
+    "titleRequired": "请输入战斗标题",
+    "repoRequired": "请输入GitHub仓库地址",
+    "implementationsRequired": "至少需要2个实现方案",
+    "implementationFieldsRequired": "请填写每个实现方案的所有必填字段（标题、描述、代码、作者）",
+    "createSuccess": "战斗创建成功！",
+    "createFailed": "创建战斗失败，请重试",
+    "creating": "创建中...",
+    "submit": "创建战斗",
+    "githubRepo": "GitHub仓库",
+    "repoPlaceholder": "例如: owner/repo"
+  },
   "navigation": {
     "arena": "竞技场",
     "login": "登录",
@@ -109,7 +129,11 @@
     "commit": "提交",
     "actions": "操作",
     "viewCode": "查看代码",
-    "userAvatar": "用户头像"
+    "userAvatar": "用户头像",
+    "unset": "未设置",
+    "menuPreferences": "偏好设置",
+    "menuVotingHistory": "投票历史",
+    "menuMyProjects": "我的项目"
   },
   "payment": {
     "paypalTitle": "PayPal 支付",
@@ -183,8 +207,10 @@
     "foundBattles": "找到 {{count}} 场对战",
     "noBattles": "暂无对战",
     "adjustFiltersOrCreate": "调整筛选条件或创建新的对战",
-    "implementations": "方案",
-    "votes": "票"
+    "implementations": "个实现方案",
+    "votes": "票",
+    "loading": "加载中...",
+    "loadingFailed": "加载失败，请检查网络连接"
   },
   "implementationCard": {
     "codeImplementation": "代码实现",

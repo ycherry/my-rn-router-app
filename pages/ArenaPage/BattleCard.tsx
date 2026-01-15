@@ -1,6 +1,7 @@
 import { useThemeColor } from "@/components/Themed";
 import type { ArenaBattle } from "@/lib/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { Text, TouchableOpacity, View } from "react-native";
 
 interface BattleCardProps {
@@ -9,6 +10,7 @@ interface BattleCardProps {
 }
 
 export const BattleCard = ({ battle, onClick }: BattleCardProps) => {
+  const { t } = useTranslation();
   const handleClick = () => {
     onClick(battle.id);
   };
@@ -48,13 +50,13 @@ export const BattleCard = ({ battle, onClick }: BattleCardProps) => {
         <View className="flex-row items-center gap-1">
           <Ionicons name="code-slash" size={16} color={textColor} />
           <Text className="text-sm" style={{ color: textColor }}>
-            {battle.implementations.length} implementations
+            {battle.implementations.length} {t("arenaPage.implementations")}
           </Text>
         </View>
         <View className="flex-row items-center gap-1">
           <Ionicons name="trophy" size={16} color={textColor} />
           <Text className="text-sm" style={{ color: textColor }}>
-            {battle.totalVotes} votes
+            {battle.totalVotes} {t("arenaPage.votes")}
           </Text>
         </View>
       </View>

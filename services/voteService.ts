@@ -1,6 +1,6 @@
 import { db } from '@/db';
-import { votes, implementations, battles } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { battles, implementations, votes } from '@/db/schema';
+import { and, eq } from 'drizzle-orm';
 
 export const VoteService = {
   // 检查用户是否已经对某个implementation投票
@@ -26,7 +26,7 @@ export const VoteService = {
 
     // 检查implementation是否存在
     const implementation = await db
-      .select({ battleId: implementations.battleId })
+      .select({ battleId: implementations.battleId, votes: implementations.votes })
       .from(implementations)
       .where(eq(implementations.id, implementationId))
       .limit(1);
@@ -37,11 +37,17 @@ export const VoteService = {
 
     // 在事务中执行投票
     return await db.transaction(async (tx) => {
-      // 插入投票记录（触发器会自动更新votes计数）
+      // 插入投票记录
       await tx.insert(votes).values({
         userId,
         implementationId,
       });
+
+      // 手动更新votes计数
+      await tx
+        .update(implementations)
+        .set({ votes: implementation[0].votes + 1 })
+        .where(eq(implementations.id, implementationId));
 
       return { success: true };
     });

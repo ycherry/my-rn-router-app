@@ -18,8 +18,8 @@ export const BattleHeader: FC = () => {
     return null;
   }
   return (
-    <View className="text-center mb-12">
-      <View className="mb-6">
+    <View className="text-center">
+      <View>
         <View className="flex items-center justify-center mb-4">
           <Text className="text-4xl font-black">
             {currentBattle.title}

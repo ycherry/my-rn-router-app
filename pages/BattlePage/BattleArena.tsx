@@ -17,7 +17,7 @@ export const BattleArena: FC = () => {
   const currentBattle = battleData?.data;
 
   return (
-    <View className="flex-row flex-wrap gap-8 mb-8">
+    <View className="flex-row flex-wrap mb-3">
       {currentBattle?.implementations.map((implementation: CodeImplementation) => (
         <ImplementationCard
           key={implementation.id}

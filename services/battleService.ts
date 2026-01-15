@@ -1,5 +1,5 @@
-import { battlesDao } from '@/db/models/daos/battles';
 import { db } from '@/db';
+import { battlesDao } from '@/db/models/daos/battles';
 import { battles, implementations } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
@@ -103,11 +103,13 @@ export const BattleService = {
     title: string;
     description: string;
     category: string;
+    createdBy?: string;
     implementations: Array<{
       title: string;
       description: string;
       code: string;
       author: string;
+      authorId?: string;
       pros: string[];
       cons: string[];
       tags: string[];
@@ -117,6 +119,7 @@ export const BattleService = {
       title: data.title,
       description: data.description,
       category: data.category,
+      createdBy: data.createdBy,
     }).returning({ id: battles.id });
 
     if (!newBattle) {
@@ -131,6 +134,7 @@ export const BattleService = {
           description: impl.description,
           code: impl.code,
           author: impl.author,
+          authorId: impl.authorId,
           pros: impl.pros,
           cons: impl.cons,
           tags: impl.tags,

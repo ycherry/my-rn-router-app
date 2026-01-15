@@ -1,4 +1,24 @@
 {
+  "common": {
+    "error": "Error",
+    "success": "Success",
+    "ok": "OK",
+    "cancel": "Cancel"
+  },
+  "createBattle": {
+    "title": "Create Battle",
+    "subtitle": "Create a new code battle and share it with the community",
+    "titleRequired": "Please enter a battle title",
+    "repoRequired": "Please enter a GitHub repository address",
+    "implementationsRequired": "At least 2 implementations are required",
+    "implementationFieldsRequired": "Please fill in all required fields for each implementation (title, description, code, author)",
+    "createSuccess": "Battle created successfully!",
+    "createFailed": "Failed to create battle, please try again",
+    "creating": "Creating...",
+    "submit": "Create Battle",
+    "githubRepo": "GitHub Repository",
+    "repoPlaceholder": "e.g., owner/repo"
+  },
   "navigation": {
     "arena": "Arena",
     "login": "Login",
@@ -109,7 +129,11 @@
     "commit": "Commit",
     "actions": "Actions",
     "viewCode": "View Code",
-    "userAvatar": "User avatar"
+    "userAvatar": "User Avatar",
+    "unset": "Not set",
+    "menuPreferences": "Preferences",
+    "menuVotingHistory": "Voting History",
+    "menuMyProjects": "My Projects"
   },
   "payment": {
     "paypalTitle": "PayPal Payment",
@@ -184,7 +208,9 @@
     "noBattles": "No battles",
     "adjustFiltersOrCreate": "Adjust filters or create a new battle",
     "implementations": "implementations",
-    "votes": "votes"
+    "votes": "votes",
+    "loading": "Loading...",
+    "loadingFailed": "Loading failed, please check your network connection"
   },
   "implementationCard": {
     "codeImplementation": "Code Implementation",

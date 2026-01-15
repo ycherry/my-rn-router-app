@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ScrollView, TouchableOpacity, View } from 'react-native';
 import { useStore } from 'zustand';
 import { useUserStore } from './_store';
@@ -33,6 +34,7 @@ export const UserContent = () => {
   const store = useUserStore();
   const { userName, userEmail, loading } = useStore(store);
   const { logout, user, loading: authLoading } = useAuth();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (user) {
@@ -45,7 +47,7 @@ export const UserContent = () => {
   if (authLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-gray-50">
-        <Text>加载中...</Text>
+        <Text>{t('submitBattle.loading')}</Text>
       </View>
     );
   }
@@ -61,8 +63,8 @@ export const UserContent = () => {
             </Text>
           </View>
           <View className="ml-4 flex-1">
-            <Text className="text-xl font-bold mb-1">{userName || '未设置'}</Text>
-            <Text className="text-gray-500 text-sm">{userEmail || '未设置'}</Text>
+            <Text className="text-xl font-bold mb-1">{userName || t('userPage.unset')}</Text>
+            <Text className="text-gray-500 text-sm">{userEmail || t('userPage.unset')}</Text>
           </View>
         </View>
       </View>
@@ -71,22 +73,22 @@ export const UserContent = () => {
       <View className="bg-white mb-3">
         <MenuItem
           icon="add-circle-outline"
-          title="Create Battle"
+          title={t('userPage.createBattle')}
           onPress={() => router.push('/create-battle')}
         />
         <MenuItem
           icon="settings-outline"
-          title="Preferences"
+          title={t('userPage.menuPreferences')}
           onPress={() => router.push('/preferences')}
         />
         <MenuItem
           icon="time-outline"
-          title="Voting History"
+          title={t('userPage.menuVotingHistory')}
           onPress={() => router.push('/voting-history')}
         />
         <MenuItem
           icon="folder-outline"
-          title="My Projects"
+          title={t('userPage.menuMyProjects')}
           onPress={() => router.push('/my-projects')}
         />
       </View>
@@ -98,7 +100,7 @@ export const UserContent = () => {
           onPress={logout}
           activeOpacity={0.7}
         >
-          <Text className="text-red-500 text-center text-base font-semibold">退出登录</Text>
+          <Text className="text-red-500 text-center text-base font-semibold">{t('userMenu.logout')}</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

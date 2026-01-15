@@ -19,6 +19,28 @@ import { VoteService } from './services/voteService';
 const app = express();
 const PORT = Number(process.env.PORT) || 8000;
 
+// Helper function to authenticate user from session token
+const authenticateUser = async (req: express.Request): Promise<string> => {
+  const sessionToken = req.cookies['better-auth.session_token'];
+  
+  if (!sessionToken) {
+    throw new Error('Unauthorized - No session token');
+  }
+
+  // 直接查询数据库验证 session
+  const { db } = await import('./db/index');
+  const { session } = await import('./drizzle/schema');
+  const { eq } = await import('drizzle-orm');
+  
+  const sessions = await db.select().from(session).where(eq(session.token, sessionToken));
+  
+  if (sessions.length === 0 || new Date(sessions[0].expiresAt) < new Date()) {
+    throw new Error('Unauthorized - Invalid or expired session');
+  }
+
+  return sessions[0].userId;
+};
+
 // Enable CORS for React Native app
 app.use(cors({
   origin: true, // Allow all origins in development
@@ -85,71 +107,106 @@ app.get('/api/battles/:id', async (req, res) => {
   }
 });
 
+app.post('/api/battles', async (req, res) => {
+  try {
+    const userId = await authenticateUser(req);
+    
+    console.log('[Battles API] Raw request body:', req.body);
+    console.log('[Battles API] Content-Type:', req.headers['content-type']);
+    
+    const { title, description, category, implementations } = req.body;
+
+    console.log('[Battles API] Parsed data:', { title, description, category, implementations });
+    console.log('[Battles API] Types:', { 
+      title: typeof title, 
+      description: typeof description, 
+      category: typeof category,
+      implementations: Array.isArray(implementations) ? 'array' : typeof implementations
+    });
+
+    // 验证必需字段
+    if (!title || !description || !category) {
+      return res.status(400).json({ error: 'Missing required fields: title, description, category' });
+    }
+
+    if (!implementations || !Array.isArray(implementations) || implementations.length < 2) {
+      return res.status(400).json({ error: 'At least 2 implementations are required' });
+    }
+
+    // 验证每个 implementation
+    for (const impl of implementations) {
+      if (!impl.title || !impl.description || !impl.code || !impl.author) {
+        return res.status(400).json({ 
+          error: 'Each implementation must have title, description, code, and author' 
+        });
+      }
+    }
+
+    // 创建 battle
+    const newBattle = await BattleService.createWithImplementations({
+      title,
+      description,
+      category,
+      createdBy: userId,
+      implementations: implementations.map((impl: any) => ({
+        title: impl.title,
+        description: impl.description,
+        code: impl.code,
+        author: impl.author,
+        authorId: userId,
+        pros: impl.pros || [],
+        cons: impl.cons || [],
+        tags: impl.tags || [],
+      })),
+    });
+
+    console.log('[Battles API] Battle created successfully:', newBattle.id);
+    res.status(201).json({ data: newBattle });
+  } catch (error: any) {
+    console.error('[Battles API] Error:', error);
+    if (error.message.includes('Unauthorized')) {
+      res.status(401).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: error.message || 'Internal server error' });
+    }
+  }
+});
+
 // Votes API routes - 直接查询数据库验证 session
 app.get('/api/votes', async (req, res) => {
   try {
-    // 从 cookie 中提取 session token
-    const sessionToken = req.cookies['better-auth.session_token'];
-    
-    if (!sessionToken) {
-      return res.status(401).json({ error: 'Unauthorized - No session token' });
-    }
-
-    // 直接查询数据库验证 session
-    const { db } = await import('./db/index');
-    const { session } = await import('./drizzle/schema');
-    const { eq } = await import('drizzle-orm');
-    
-    const sessions = await db.select().from(session).where(eq(session.token, sessionToken));
-    
-    if (sessions.length === 0 || new Date(sessions[0].expiresAt) < new Date()) {
-      return res.status(401).json({ error: 'Unauthorized - Invalid or expired session' });
-    }
-
-    const userId = sessions[0].userId;
+    const userId = await authenticateUser(req);
     const votes = await VoteService.getUserVotes(userId);
     res.json({ data: votes, total: votes.length });
-  } catch (error) {
+  } catch (error: any) {
     console.error('[Votes API] Error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(error.message.includes('Unauthorized') ? 401 : 500).json({ error: error.message || 'Internal server error' });
   }
 });
 
 app.post('/api/votes', async (req, res) => {
   try {
-    // 从 cookie 中提取 session token
-    const sessionToken = req.cookies['better-auth.session_token'];
-    
-    if (!sessionToken) {
-      return res.status(401).json({ error: 'Unauthorized - No session token' });
-    }
-
-    // 直接查询数据库验证 session
-    const { db } = await import('./db/index');
-    const { session } = await import('./drizzle/schema');
-    const { eq } = await import('drizzle-orm');
-    
-    const sessions = await db.select().from(session).where(eq(session.token, sessionToken));
-    
-    if (sessions.length === 0 || new Date(sessions[0].expiresAt) < new Date()) {
-      return res.status(401).json({ error: 'Unauthorized - Invalid or expired session' });
-    }
-
-    const userId = sessions[0].userId;
+    const userId = await authenticateUser(req);
     const { implementationId } = req.body;
+
+    console.log('[Votes API] User:', userId, 'voting for implementation:', implementationId);
 
     if (!implementationId) {
       return res.status(400).json({ error: 'implementationId is required' });
     }
 
     const result = await VoteService.vote(userId, parseInt(implementationId));
-    res.json(result);
+    console.log('[Votes API] Vote successful:', result);
+    
+    res.json({ data: { success: true, implementationId: parseInt(implementationId) } });
   } catch (error: any) {
     console.error('[Votes API] Error:', error);
     if (error.message === 'User has already voted for this implementation') {
       res.status(409).json({ error: error.message });
+    } else if (error.message.includes('Unauthorized')) {
+      res.status(401).json({ error: error.message });
     } else {
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: error.message || 'Internal server error' });
     }
   }
 });

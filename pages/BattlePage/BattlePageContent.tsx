@@ -21,8 +21,6 @@ export const BattlePageContent = () => {
 
   const currentBattle = data?.data;
 
-  console.log("BattlePageContent - currentBattle:", currentBattle);
-
   if (isLoading) {
     return <BattleLoading />;
   }

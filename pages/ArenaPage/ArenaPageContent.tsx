@@ -82,7 +82,7 @@ export const ArenaPageContent = () => {
   if (isLoading) {
     return (
       <View className="flex-1 justify-center items-center" style={{ backgroundColor }}>
-        <Text style={{ color: textColor }}>加载中...</Text>
+        <Text style={{ color: textColor }}>{t("arenaPage.loading")}</Text>
       </View>
     );
   }
@@ -91,7 +91,7 @@ export const ArenaPageContent = () => {
   if (isError) {
     return (
       <View className="flex-1 justify-center items-center" style={{ backgroundColor }}>
-        <Text style={{ color: textColor }}>加载失败，请检查网络连接</Text>
+        <Text style={{ color: textColor }}>{t("arenaPage.loadingFailed")}</Text>
       </View>
     );
   }
@@ -112,7 +112,7 @@ export const ArenaPageContent = () => {
       <View className="max-w-[1200px] self-center w-full px-6 py-8">
         <View className="flex-row justify-between items-center mb-6">
           <Text className="text-sm" style={{ color: textColor }}>
-            {t("arenaPage.foundBattles", { count: filteredBattles.length })} 场对战
+            {t("arenaPage.foundBattles", { count: filteredBattles.length })}
           </Text>
         </View>
 

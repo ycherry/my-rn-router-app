@@ -1,12 +1,20 @@
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
-export const LanguageSelect = () => {
+interface LanguageSelectProps {
+  onLanguageChange?: (language: string) => void;
+}
+
+export const LanguageSelect = ({ onLanguageChange }: LanguageSelectProps) => {
   const { i18n } = useTranslation();
 
   const toggleLanguage = () => {
     const newLang = i18n.language === "en" ? "zh" : "en";
-    i18n.changeLanguage(newLang);
+    if (onLanguageChange) {
+      onLanguageChange(newLang);
+    } else {
+      i18n.changeLanguage(newLang);
+    }
   };
 
   return (

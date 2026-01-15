@@ -3,7 +3,7 @@ import type { CodeImplementation } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { AIPromptGenerator, type AIPrompt } from "@/utils/aiPromptGenerator";
 import { Ionicons } from "@expo/vector-icons";
-import { useCreate, useList, useOne } from "@refinedev/core";
+import { useCreate, useInvalidate, useList, useOne } from "@refinedev/core";
 import { useLocalSearchParams } from "expo-router";
 import { useState, type FC } from "react";
 import { useTranslation } from "react-i18next";
@@ -21,30 +21,34 @@ export const ImplementationCard: FC<ImplementationCardProps> = ({
   const { user } = useAuth();
   const { t } = useTranslation();
 
-  const { data: battleData } = useOne({
+  const { query } = useOne({
     resource: "battles",
     id: battleId,
   });
 
-  const currentBattle = battleData?.data;
+  const { data, isLoading, isError } = query;
 
-  const { data: userVotesData } = useList({
+  const currentBattle = data?.data;
+
+  const { result: userVotesResult } = useList({
     resource: "votes",
     filters: user ? [{ field: "userId", operator: "eq", value: user.id }] : [],
   });
 
-  const userVotes = userVotesData?.data?.reduce((acc: Record<string, string>, vote: any) => {
-    acc[vote.battleId] = vote.implementationId.toString();
+  const userVotes = userVotesResult?.data?.reduce((acc: Record<string, boolean>, vote: any) => {
+    acc[vote.implementationId.toString()] = true;
     return acc;
   }, {}) || {};
 
   const { mutate: voteForImplementation } = useCreate();
 
+  const invalidate = useInvalidate();
+
   const totalVotes =
     currentBattle?.implementations?.reduce((sum: number, impl: any) => sum + impl.votes, 0) ||
     0;
-  const hasVoted = battleId ? userVotes[battleId] !== undefined : false;
-  const userVoteId = battleId ? userVotes[battleId] : undefined;
+  const hasVoted = currentBattle?.implementations?.some((impl: any) => userVotes[impl.id.toString()]) || false;
+  const userVoteId = currentBattle?.implementations?.find((impl: any) => userVotes[impl.id.toString()])?.id.toString();
   const battleTitle = currentBattle?.title || "";
   const category = currentBattle?.category || "";
 
@@ -62,19 +66,37 @@ export const ImplementationCard: FC<ImplementationCardProps> = ({
 
   const handleVote = () => {
     if (battleId && !hasVoted && user) {
-      voteForImplementation({
-        resource: "votes",
-        values: {
-          userId: user.id,
-          implementationId: implementation.id,
+      voteForImplementation(
+        {
+          resource: "votes",
+          values: {
+            implementationId: implementation.id,
+          },
         },
-      });
+        {
+          onSuccess: () => {
+            // 刷新投票列表和战斗详情
+            invalidate({
+              resource: "votes",
+              invalidates: ["list"],
+            });
+            invalidate({
+              resource: "battles",
+              id: battleId,
+              invalidates: ["detail"],
+            });
+          },
+          onError: (error) => {
+            console.error("Vote error:", error);
+          },
+        }
+      );
     }
   };
   const handleClose = () => setShowAIPrompt(false);
 
   return (
-    <View className={cn("relative p-6", isUserVote && "border-primary border-2")}>
+    <View className={cn("relative p-2", isUserVote && "border-primary border-2")}>
       <View className="mb-4">
         <View className="flex items-start justify-between mb-3">
           <View className="flex-1">
@@ -90,7 +112,7 @@ export const ImplementationCard: FC<ImplementationCardProps> = ({
         </View>
       </View>
 
-      <View className="p-4 mb-4 bg-gray-100 rounded">
+      <View className="p-4 mb-2 bg-gray-100 rounded">
         <View className="flex items-center justify-between mb-2">
           <View className="flex items-center space-x-2 text-primary">
             <Ionicons name="code" size={16} color="currentColor" />
@@ -123,7 +145,7 @@ export const ImplementationCard: FC<ImplementationCardProps> = ({
         </View>
       )}
 
-      <View className="flex flex-row space-x-3 mt-4">
+      <View className="flex flex-row space-x-3 mt-2">
         {/* 主要投票按钮 */}
         <TouchableOpacity
           onPress={handleVote}
@@ -145,9 +167,8 @@ export const ImplementationCard: FC<ImplementationCardProps> = ({
         <TouchableOpacity
           onPress={handleGeneratePrompt}
           className="flex items-center space-x-2 py-2 px-4 rounded border border-gray-300"
-          title={t("implementationCard.getAIPrompt")}
         >
-          <Ionicons name="robot" size={16} color="currentColor" />
+          <Ionicons name="bulb" size={16} color="currentColor" />
           <Text>{t("implementationCard.prompt")}</Text>
         </TouchableOpacity>
       </View>

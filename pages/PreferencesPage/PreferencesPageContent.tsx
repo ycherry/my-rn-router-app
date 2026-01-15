@@ -1,5 +1,6 @@
 import { Text } from '@/components/Themed';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, Switch, TouchableOpacity, View } from 'react-native';
 import { useStore } from 'zustand';
 import { usePreferencesPageStore } from './_store';
@@ -16,10 +17,26 @@ export const PreferencesPageContent = () => {
     setNotifications,
     setLoading,
   } = useStore(store);
+  const { i18n } = useTranslation();
+  const isInitialized = useRef(false);
+
+  // 初始化时同步当前语言到 store
+  useEffect(() => {
+    if (!isInitialized.current) {
+      setLanguage(i18n.language);
+      isInitialized.current = true;
+    }
+  }, [i18n.language, setLanguage]);
+
+  const handleLanguageChange = (newLanguage: string) => {
+    setLanguage(newLanguage);
+  };
 
   const handleSave = async () => {
     setLoading(true);
     try {
+      // 应用语言变更
+      await i18n.changeLanguage(language);
       // TODO: 调用保存偏好设置的API
       await new Promise(resolve => setTimeout(resolve, 500));
       Alert.alert('成功', '偏好设置已保存');
@@ -43,7 +60,7 @@ export const PreferencesPageContent = () => {
               className={`flex-1 py-3 px-4 mr-2 rounded-lg border ${
                 language === 'zh' ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-300'
               }`}
-              onPress={() => setLanguage('zh')}
+              onPress={() => handleLanguageChange('zh')}
             >
               <Text className={`text-center ${language === 'zh' ? 'text-white' : 'text-gray-700'}`}>
                 中文
@@ -53,7 +70,7 @@ export const PreferencesPageContent = () => {
               className={`flex-1 py-3 px-4 rounded-lg border ${
                 language === 'en' ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-300'
               }`}
-              onPress={() => setLanguage('en')}
+              onPress={() => handleLanguageChange('en')}
             >
               <Text className={`text-center ${language === 'en' ? 'text-white' : 'text-gray-700'}`}>
                 English
